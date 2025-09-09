@@ -2,298 +2,232 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>我的增肌训练计划 | 每日查看与导入</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <title>我的增肌训练计划｜每日查看与导入</title>
   <style>
+    /* === 基础主题（移动优先）=== */
     :root{
-      --bg: #0b1020;
-      --card: #121831;
-      --muted: #9fb0ff;
-      --text: #e9edff;
-      --sub: #c9d2ff;
-      --accent: #6fa3ff;
-      --accent-2:#7ef0c4;
-      --border: #25305a;
-      --chip:#1a2242;
-      --good:#89f0a9;
-      --warn:#ffd166;
+      --bg: #0b1020; --card:#121831; --muted:#9fb0ff; --text:#e9edff; --sub:#c9d2ff;
+      --accent:#6fa3ff; --accent-2:#7ef0c4; --border:#25305a; --chip:#1a2242; --good:#89f0a9;
+      --warn:#ffd166; --radius:14px; --shadow: 0 6px 24px rgba(0,0,0,.24);
+      --tap: 44px; /* 手机可触达尺寸 */
     }
-    .light{
-      --bg:#f7f9ff; --card:#ffffff; --text:#0f1a3a; --sub:#33406a; --muted:#5060a8;
-      --accent:#2b6cff; --accent-2:#0aa57a; --border:#dfe6ff; --chip:#eef2ff; --good:#0aa57a; --warn:#b98200;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, PingFang SC, Noto Sans CJK SC, Helvetica, Arial, "Microsoft Yahei", "Hiragino Sans GB", sans-serif;background:var(--bg);color:var(--text);}
-    a{color:var(--accent)} a:hover{text-decoration:underline}
-    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
-    aside{border-right:1px solid var(--border);background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card);position:sticky;top:0;height:100vh}
-    header{position:sticky;top:0;z-index:9;background:linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,0));backdrop-filter:saturate(120%) blur(6px);}
-    .brand{display:flex;align-items:center;gap:.6rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
-    .logo{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 220deg, var(--accent), var(--accent-2));box-shadow:0 0 0 2px #0003}
-    .brand h1{font-size:1.05rem;margin:0}
-    .toolbar{display:flex;flex-wrap:wrap;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
-    .toolbar .btn{appearance:none;border:1px solid var(--border);background:var(--card);color:var(--text);padding:.55rem .7rem;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:.45rem;font-size:.92rem}
-    .btn:hover{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent)}
-    .btn.primary{background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 26%, transparent), transparent);border-color:color-mix(in oklab, var(--accent) 40%, var(--border))}
-    .btn.ghost{background:transparent}
-    .toolbar input[type="search"]{flex:1 1 280px;min-width:180px;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:.55rem .75rem;font-size:.95rem}
-    .days{padding:1rem;display:flex;flex-direction:column;gap:.5rem}
-    .day-btn{width:100%;text-align:left;border:1px solid var(--border);background:var(--chip);color:var(--text);padding:.75rem .8rem;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
-    .day-btn small{opacity:.8;color:var(--sub)}
-    .day-btn.active{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent)}
-    main{padding-bottom:8rem}
-    .wrap{max-width:1100px;margin:0 auto;padding:0 1rem 2rem}
-    .headline{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem;padding:1rem 0 0}
-    .headline h2{font-size:1.6rem;margin:.2rem 0}
-    .chip{display:inline-flex;align-items:center;gap:.35rem;background:var(--chip);border:1px solid var(--border);color:var(--sub);padding:.25rem .55rem;border-radius:999px;font-size:.82rem}
-    .section{margin:1rem 0;border:1px solid var(--border);border-radius:16px;background:var(--card);overflow:hidden}
-    .section h3{margin:0;padding:1rem 1rem;border-bottom:1px solid var(--border);font-size:1.02rem;color:var(--muted);letter-spacing:.02em}
-    .content{padding:1rem}
-    .grid{display:grid;grid-template-columns:repeat(1, minmax(0,1fr));gap:12px}
-    @media (min-width:720px){.grid{grid-template-columns:repeat(2, minmax(0,1fr))}}
-    @media (min-width:1024px){.grid{grid-template-columns:repeat(3, minmax(0,1fr))}}
-    .ex-card{border:1px solid var(--border);border-radius:14px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card);display:flex;flex-direction:column;gap:8px}
-    .ex-top{display:flex;gap:.6rem;align-items:center}
-    .check{width:20px;height:20px;border-radius:6px;border:1px solid var(--border);display:inline-grid;place-items:center;cursor:pointer;background:var(--bg)}
-    .check.done{background:var(--good);border-color:color-mix(in oklab, var(--good) 70%, #000)}
-    .title{font-weight:700}
-    .meta{display:flex;flex-wrap:wrap;gap:.4rem .6rem;color:var(--sub);font-size:.86rem}
-    .muscles{display:flex;flex-wrap:wrap;gap:.35rem}
-    .muscles .m{font-size:.78rem;background:var(--chip);border:1px solid var(--border);padding:.18rem .45rem;border-radius:999px;color:var(--text)}
-    .cues{margin:.25rem 0 0;padding-left:1.1rem}
-    .cues li{margin:.2rem 0}
-    .links{display:flex;align-items:center;gap:.6rem;margin-top:.25rem}
-    .links a{font-size:.9rem}
-    .muted{color:var(--sub)}
-    .foot{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;justify-content:space-between;padding:1rem 0}
-    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-size:.86rem;background:var(--chip);border:1px dashed var(--border);padding:.1rem .4rem;border-radius:6px;color:var(--sub)}
-    .badges{display:flex;gap:.45rem;flex-wrap:wrap}
-    .badge{border:1px solid var(--border);background:var(--chip);padding:.2rem .5rem;border-radius:999px;font-size:.78rem;color:var(--sub)}
-    .divider{height:1px;background:var(--border);margin:.75rem 0}
-    .sp{height:10px}
-    .empty{opacity:.7}
+    .light{ --bg:#f8faff; --card:#ffffff; --text:#0f1a3a; --sub:#33406a; --muted:#5060a8; --accent:#2b6cff; --accent-2:#0aa57a; --border:#dfe6ff; --chip:#eef2ff; --good:#0aa57a; --warn:#b98200; }
+    @media (prefers-color-scheme: light){ :root{ color-scheme: light; } }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, PingFang SC, Microsoft YaHei, Helvetica, Arial, Noto Sans CJK SC, sans-serif; background:var(--bg); color:var(--text); overscroll-behavior-y:none; }
+    a{ color:var(--accent) }
 
-    /* print */
+    /* 布局：移动端单列，侧栏抽屉化 */
+    .app{ display:grid; grid-template-columns: 1fr; min-height: 100dvh; }
+    header.topbar{ position:sticky; top:0; z-index:30; backdrop-filter:saturate(120%) blur(6px); background:linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,0)); }
+    .brand{ display:flex; align-items:center; gap:.6rem; padding:.8rem 1rem; border-bottom:1px solid var(--border) }
+    .logo{ width:28px; height:28px; border-radius:8px; background:conic-gradient(from 220deg, var(--accent), var(--accent-2)); box-shadow:0 0 0 2px #0003 }
+    .brand h1{ font-size:clamp(16px, 3.2vw, 18px); margin:0; letter-spacing:.02em }
+
+    .toolbar{ position:sticky; top:54px; z-index:25; display:flex; gap:.5rem; padding:.65rem 1rem; border-bottom:1px solid var(--border); background:var(--card) }
+    .btn{ appearance:none; border:1px solid var(--border); background:var(--chip); color:var(--text); padding:.55rem .7rem; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:.45rem; font-size:.92rem; min-height:var(--tap); touch-action:manipulation }
+    .btn.primary{ background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 20%, transparent), transparent) }
+    .btn.ghost{ background:transparent }
+    .toolbar input[type="search"]{ flex:1 1 auto; min-width:0; border:1px solid var(--border); background:var(--card); color:var(--text); border-radius:12px; padding:.55rem .75rem; font-size:.95rem }
+
+    /* 侧栏抽屉 */
+    aside.drawer{ position:fixed; inset:0 auto 0 0; width:min(86vw, 320px); transform:translateX(-101%); transition:transform .25s ease; background:var(--card); border-right:1px solid var(--border); z-index:40; display:flex; flex-direction:column; }
+    .drawer.open{ transform:none }
+    .drawer .days{ padding:1rem; display:flex; flex-direction:column; gap:.5rem; overflow:auto }
+    .day-btn{ width:100%; text-align:left; border:1px solid var(--border); background:var(--chip); color:var(--text); padding:.75rem .8rem; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; min-height:var(--tap) }
+    .day-btn small{ opacity:.8; color:var(--sub) }
+    .day-btn.active{ border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent) }
+    .backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(2px); z-index:35; opacity:0; pointer-events:none; transition:opacity .2s }
+    .backdrop.show{ opacity:1; pointer-events:auto }
+
+    /* 主区 */
+    main{ padding-bottom:calc(64px + env(safe-area-inset-bottom)); }
+    .wrap{ max-width:1100px; margin:0 auto; padding: .5rem 1rem 1.5rem }
+    .headline{ display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; padding:.8rem 0 .2rem }
+    .headline h2{ font-size:clamp(18px, 4.2vw, 26px); margin:0 }
+    .chip{ display:inline-flex; align-items:center; gap:.35rem; background:var(--chip); border:1px solid var(--border); color:var(--sub); padding:.24rem .5rem; border-radius:999px; font-size:.8rem }
+
+    .section{ margin:1rem 0; border:1px solid var(--border); border-radius:var(--radius); background:var(--card); overflow:hidden; box-shadow:var(--shadow) }
+    .section h3{ margin:0; padding:.85rem 1rem; border-bottom:1px solid var(--border); font-size:1rem; color:var(--muted) }
+    .content{ padding: .75rem }
+
+    .grid{ display:grid; grid-template-columns:1fr; gap:12px }
+    @media (min-width:640px){ .grid{ grid-template-columns:repeat(2, minmax(0,1fr)) } }
+    @media (min-width:1024px){ .grid{ grid-template-columns:repeat(3, minmax(0,1fr)) } }
+
+    .ex-card{ border:1px solid var(--border); border-radius:12px; padding:12px; background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card); display:flex; flex-direction:column; gap:8px }
+    .ex-top{ display:flex; gap:.6rem; align-items:center }
+    .check{ width:22px; height:22px; border-radius:6px; border:1px solid var(--border); display:inline-grid; place-items:center; cursor:pointer; background:var(--bg) }
+    .check.done{ background:var(--good); border-color:color-mix(in oklab, var(--good) 70%, #000) }
+    .title{ font-weight:700 }
+    .meta{ display:flex; flex-wrap:wrap; gap:.4rem .6rem; color:var(--sub); font-size:.86rem }
+    .muscles{ display:flex; flex-wrap:wrap; gap:.35rem }
+    .muscles .m{ font-size:.78rem; background:var(--chip); border:1px solid var(--border); padding:.18rem .45rem; border-radius:999px; color:var(--text) }
+    .cues{ margin:.25rem 0 0; padding-left:1.1rem }
+    .cues li{ margin:.18rem 0 }
+    .links{ display:flex; align-items:center; gap:.6rem; margin-top:.2rem }
+
+    /* 底部移动操作条 */
+    .mbar{ position:fixed; left:0; right:0; bottom:0; z-index:50; display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; padding: .5rem max(1rem, env(safe-area-inset-left)) calc(.5rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-right)); border-top:1px solid var(--border); background:var(--card) }
+    .mbar .btn{ justify-content:center; font-size:.9rem; min-height:40px }
+
+    /* 桌面视图：显示侧栏，隐藏底部条 */
+    @media (min-width:960px){
+      .app{ grid-template-columns: 280px 1fr }
+      aside.drawer{ position:sticky; transform:none; top:0; height:100dvh }
+      .backdrop, .mbar, #drawerBtn{ display:none }
+      .toolbar{ top:0; position:static; border-bottom:1px solid var(--border) }
+      main{ padding-bottom:1.5rem }
+    }
+
+    /* 打印 */
     @media print{
-      .app{display:block}
-      aside, header, .toolbar{display:none!important}
-      body{background:#fff;color:#000}
-      .section{break-inside:avoid}
-      a::after{content:" (" attr(href) ")";font-size:.8em;color:#444}
+      .backdrop, .mbar, #drawerBtn{ display:none !important }
+      aside.drawer{ display:block; transform:none; position:static }
+      header.topbar, .toolbar{ position:static; background:#fff; color:#000 }
+      body{ background:#fff; color:#000 }
+      a::after{ content:" (" attr(href) ")"; font-size:.8em; color:#444 }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside>
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <h1>增肌训练计划</h1>
-      </div>
-      <div class="toolbar">
-        <button class="btn primary" id="importBtn" title="导入 JSON 计划"><span>📥</span> 导入计划</button>
-        <input type="file" id="filePicker" accept="application/json" hidden>
-        <button class="btn" id="exportBtn" title="导出当前计划 JSON"><span>📤</span> 导出</button>
-        <button class="btn" id="printBtn" title="打印或保存为 PDF"><span>🖨️</span> 打印</button>
-        <button class="btn ghost" id="themeBtn" title="切换明/暗色"><span>🌓</span> 主题</button>
-        <input id="search" type="search" placeholder="搜索动作 / 关键字…" />
-      </div>
+  <div class="app" id="app">
+    <!-- 抽屉侧栏（移动端可收起） -->
+    <aside class="drawer" id="drawer" aria-label="训练日选择">
+      <div class="brand"><div class="logo" aria-hidden="true"></div><h1>增肌训练计划</h1></div>
       <div class="days" id="dayList"></div>
     </aside>
+    <div class="backdrop" id="backdrop" aria-hidden="true"></div>
 
     <main>
+      <header class="topbar">
+        <div class="brand" style="border-bottom:none">
+          <button id="drawerBtn" class="btn ghost" aria-label="打开菜单" title="菜单">☰</button>
+          <h1 style="margin:0;font-size:clamp(18px,4.2vw,22px)">我的增肌训练计划</h1>
+        </div>
+        <div class="toolbar">
+          <button class="btn primary" id="importBtn" title="导入 JSON 计划">📥 导入</button>
+          <input type="file" id="filePicker" accept="application/json" hidden>
+          <button class="btn" id="exportBtn" title="导出当前计划 JSON">📤 导出</button>
+          <button class="btn" id="printBtn" title="打印或保存为 PDF">🖨️ 打印</button>
+          <button class="btn ghost" id="themeBtn" title="切换明/暗色">🌓 主题</button>
+          <input id="search" type="search" placeholder="搜索动作 / 肌群…" aria-label="搜索" />
+        </div>
+      </header>
+
       <div class="wrap">
-        <header class="headline">
+        <div class="headline">
           <h2 id="dayTitle">——</h2>
           <span class="chip" id="metaChip">RIR 1–3 · 复合 90–120s 休息 · 孤立 60–90s</span>
-          <span class="chip">点击 ☐ 勾选动作，保存于此设备</span>
-        </header>
-
-        <section class="section" id="warmupSec">
-          <h3>热身</h3>
-          <div class="content" id="warmup"></div>
-        </section>
-
-        <section class="section">
-          <h3>力量训练</h3>
-          <div class="content">
-            <div class="grid" id="exerciseGrid"></div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h3>当日拉伸（每动作 20–40 秒 × 2 组）</h3>
-          <div class="content" id="stretching"></div>
-        </section>
-
-        <section class="section">
-          <h3>当日营养与补水</h3>
-          <div class="content" id="nutrition"></div>
-        </section>
-
-        <div class="foot">
-          <div class="badges">
-            <span class="badge">双重进阶：达区间上限且仍有余力 → 下次每手 +1–2 kg</span>
-            <span class="badge">若无更重哑铃 → 加次数 / 延长离心 / 底部停顿</span>
-          </div>
-          <div class="muted">提示：<span class="kbd">Ctrl/⌘ + P</span> 可快速打印。</div>
         </div>
 
+        <section class="section" id="warmupSec"><h3>热身</h3><div class="content" id="warmup"></div></section>
+        <section class="section"><h3>力量训练</h3><div class="content"><div class="grid" id="exerciseGrid"></div></div></section>
+        <section class="section"><h3>当日拉伸（每动作 20–40 秒 × 2 组）</h3><div class="content" id="stretching"></div></section>
+        <section class="section"><h3>当日营养与补水</h3><div class="content" id="nutrition"></div></section>
       </div>
     </main>
+
+    <!-- 移动端底部操作条 -->
+    <nav class="mbar" aria-label="底部操作">
+      <button class="btn" id="mImport">📥 导入</button>
+      <button class="btn" id="mExport">📤 导出</button>
+      <button class="btn" id="mPrint">🖨️ 打印</button>
+      <button class="btn" id="mTheme">🌓 主题</button>
+    </nav>
   </div>
 
   <script>
-    // —— 数据结构：可导入/导出 ——
-    /**
-     * 计划 JSON 结构说明（导入文件需与此一致）：
-     * {
-     *   meta:{ title, updated },
-     *   days:[
-     *     {
-     *       id:"D1", name:"Push A（胸/肩/三头）",
-     *       warmup:["…"],
-     *       exercises:[{title, sets:"4×6–10", rir:"RIR 1–2", muscles:["主：胸中束","辅：前三角/肱三头"], cues:["…"], links:[{label:"视频", href:"…"}] }],
-     *       stretching:["…"],
-     *       nutrition:["…"]
-     *     }, …
-     *   ]
-     * }
-     */
-
+    // —— 数据（保持与你当前版本一致，可直接替换）——
     const planData = {
-      meta:{ title:"6 练 1 休 · 增肌训练计划（哑铃/俯卧撑板/凳）", updated:"v1" },
+      meta:{ title:"6 练 1 休 · 增肌训练计划（哑铃/俯卧撑板/凳）", updated:"v2-responsive" },
       days:[
-        {
-          id:"D1", name:"Push A（胸/肩/三头）",
-          warmup:["轻有氧 3–5′ → 肩/胸动态活动 → 卧推动作热身 2 组"],
+        { id:"D1", name:"Push A（胸/肩/三头）", warmup:["轻有氧 3–5′ → 肩/胸动态活动 → 卧推动作热身 2 组"],
           exercises:[
             { title:"哑铃平板卧推", sets:"4×6–10", rir:"RIR 1–2", muscles:["主：胸中束","辅：前三角/肱三头"], cues:["肩胛后缩下沉","肘外展 45–60°","2–3 秒离心 + 底停 1 秒","手腕中立不后折"] },
-            { title:"上斜卧推（30°）", sets:"3×8–12", rir:"", muscles:["主：胸上束","辅：前三角/肱三头"], cues:["落点偏上胸","顶端不过伸，避免肩前移"] },
-            { title:"宽握俯卧撑（俯卧撑板）", sets:"3×12–15", rir:"", muscles:["主：胸大肌","稳：核心"], cues:["身体一直线","慢离心","胸降至手柄高度"] },
-            { title:"坐姿哑铃肩上推举", sets:"3×6–10", rir:"", muscles:["主：三角肌前/中束","辅：肱三头"], cues:["肩下沉不耸","手腕中立","上推至耳旁位"] },
-            { title:"侧平举", sets:"3×12–15", rir:"", muscles:["主：三角肌中束"], cues:["肘略高于腕","到肩高即停","顶端停 1 s"] },
-            { title:"仰卧哑铃臂屈伸（头后）", sets:"3×10–12", rir:"", muscles:["主：肱三头长头"], cues:["上臂尽量垂直","只伸肘","离心慢"] },
+            { title:"上斜卧推（30°）", sets:"3×8–12", muscles:["主：胸上束","辅：前三角/肱三头"], cues:["落点偏上胸","顶端不过伸，避免肩前移"] },
+            { title:"宽握俯卧撑（俯卧撑板）", sets:"3×12–15", muscles:["主：胸大肌","稳：核心"], cues:["身体一直线","慢离心","胸降至手柄高度"] },
+            { title:"坐姿哑铃肩上推举", sets:"3×6–10", muscles:["主：三角肌前/中束","辅：肱三头"], cues:["肩下沉不耸","手腕中立","上推至耳旁位"] },
+            { title:"侧平举", sets:"3×12–15", muscles:["主：三角肌中束"], cues:["肘略高于腕","到肩高即停","顶端停 1 s"] },
+            { title:"仰卧哑铃臂屈伸（头后）", sets:"3×10–12", muscles:["主：肱三头长头"], cues:["上臂尽量垂直","只伸肘","离心慢"] },
           ],
           stretching:["门框胸肌（多角度）","上胸斜角拉伸","肱三头过顶拉伸","前三角/胸小肌放松","颈斜方轻牵引"],
-          nutrition:[
-            "训练后 0–30 分钟：乳清 1 勺 + 快碳 30–50 g（香蕉/面包/米饼）",
-            "1–2 小时：鸡胸 150–200 g + 主食 80–120 g + 健康脂肪 10–15 g",
-            "补水 500–700 ml；可肌酸 5 g/天"
-          ]
-        },
-        {
-          id:"D2", name:"Pull A（背/二头/后束）",
-          warmup:["上背/肩胛激活 → 划船热身"],
+          nutrition:["0–30 分钟：乳清 1 勺 + 快碳 30–50 g","1–2 小时：鸡胸 150–200 g + 主食 80–120 g + 脂肪 10–15 g","补水 500–700 ml；肌酸 5 g/天"] },
+
+        { id:"D2", name:"Pull A（背/二头/后束）", warmup:["上背/肩胛激活 → 划船热身"],
           exercises:[
-            { title:"单臂哑铃划船", sets:"4×8–12/侧", rir:"", muscles:["主：背阔/中下斜方","辅：后束/肱二头"], cues:["先收肩胛再弯肘","向髋部拉","离心有拉伸感"], links:[{label:"动作示范视频", href:"https://www.bilibili.com/video/BV1Va411o7Mc/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"}] },
-            { title:"胸托哑铃划船", sets:"3×10–12", rir:"", muscles:["主：中背（菱形/斜方）","辅：背阔/后束"], cues:["胸骨顶凳、脊柱中立","顶端夹肩胛 1 s"], links:[{label:"动作示范视频", href:"https://www.bilibili.com/video/BV1vU411o7ba/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"}] },
-            { title:"哑铃上拉（Pullover）", sets:"3×10–12", rir:"", muscles:["主：背阔","辅：胸下束"], cues:["肘微屈固定","胸上→耳后拉伸","回程用背阔带回"], links:[{label:"动作示范视频", href:"https://www.bilibili.com/video/BV1tm4y1s7Np/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"}] },
-            { title:"俯卧后束飞鸟", sets:"3×12–15", rir:"", muscles:["主：三角肌后束","辅：菱形/斜方中下"], cues:["抱大树弧线外展","顶端挤压 1 s"], links:[{label:"动作示范视频", href:"https://www.bilibili.com/video/BV1X441157ET/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"}] },
-            { title:"锤式弯举（你写‘垂式弯举’）", sets:"3×10–12", rir:"", muscles:["主：肱肌/肱桡肌","辅：肱二头"], cues:["中立握、肘贴身","下放 2–3 s"] },
-            { title:"旋后弯举", sets:"2×12–15", rir:"", muscles:["主：肱二头"], cues:["向上旋后至掌心朝上","顶峰停 1 s"], links:[{label:"动作示范视频", href:"https://www.bilibili.com/video/BV18U79zcEwg/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"}] },
+            { title:"单臂哑铃划船", sets:"4×8–12/侧", muscles:["主：背阔/中下斜方","辅：后束/二头"], cues:["先收肩胛再弯肘","向髋部拉","离心拉伸"], links:[{label:"示范", href:"https://www.bilibili.com/video/BV1Va411o7Mc/"}] },
+            { title:"胸托哑铃划船", sets:"3×10–12", muscles:["主：中背（菱形/斜方）"], cues:["胸骨顶凳，脊柱中立","顶端夹肩胛 1 s"], links:[{label:"示范", href:"https://www.bilibili.com/video/BV1vU411o7ba/"}] },
+            { title:"哑铃上拉（Pullover）", sets:"3×10–12", muscles:["主：背阔"], cues:["肘微屈固定","胸上→耳后拉伸"], links:[{label:"示范", href:"https://www.bilibili.com/video/BV1tm4y1s7Np/"}] },
+            { title:"俯卧后束飞鸟", sets:"3×12–15", muscles:["主：三角肌后束"], cues:["抱大树弧线外展","顶端挤压 1 s"], links:[{label:"示范", href:"https://www.bilibili.com/video/BV1X441157ET/"}] },
+            { title:"锤式弯举", sets:"3×10–12", muscles:["主：肱肌/肱桡肌"], cues:["中立握，肘贴身","离心 2–3 s"] },
+            { title:"旋后弯举", sets:"2×12–15", muscles:["主：肱二头"], cues:["向上旋后至掌心朝上","顶峰停 1 s"], links:[{label:"示范", href:"https://www.bilibili.com/video/BV18U79zcEwg/"}] },
           ],
-          stretching:["背阔‘婴儿式’","穿针引线（胸椎旋转）","胸椎温和伸展","二头肌墙面拉伸","前臂屈/伸肌拉伸"],
-          nutrition:[
-            "乳清 1 勺 + 快碳 30–50 g",
-            "正餐：鸡胸 150–200 g + 主食 80–120 g + 脂肪 10 g",
-            "大量出汗可加电解质"
-          ]
-        },
-        {
-          id:"D3", name:"Legs A & 核心",
-          warmup:["髋/踝/膝动态 → 空杆深蹲/臀桥热身"],
+          stretching:["背阔‘婴儿式’","穿针引线（胸椎旋转）","胸椎温和伸展","二头墙面拉伸","前臂屈/伸肌"],
+          nutrition:["乳清 1 勺 + 快碳 30–50 g","鸡胸 150–200 g + 主食 80–120 g + 脂肪 10 g","大量出汗可加电解质"] },
+
+        { id:"D3", name:"Legs A & 核心", warmup:["髋/踝/膝动态 → 空杆深蹲/臀桥热身"],
           exercises:[
-            { title:"高举深蹲（Goblet）", sets:"4×8–12", rir:"", muscles:["主：股四头/臀大肌","稳：核心/竖脊"], cues:["膝随脚尖","底停 1 s","整脚发力站起"] },
-            { title:"哑铃罗马尼亚硬拉（RDL）", sets:"4×8–10", rir:"", muscles:["主：腘绳肌/臀大肌","稳：竖脊"], cues:["髋主导后移，背中立","沿大腿前侧下放","上来时挤臀"] },
-            { title:"保加利亚分腿蹲", sets:"3×8–12/侧", rir:"", muscles:["主：股四头/臀大肌"], cues:["前脚全脚掌受力","臀向下而非身体前冲","上身微前倾"] },
-            { title:"臀桥 / 凳上髋推（持哑铃）", sets:"3×10–12", rir:"", muscles:["主：臀大肌","辅：腘绳肌"], cues:["下巴微收","顶峰骨盆后倾 1–2 s"] },
-            { title:"站姿提踵", sets:"4×12–15", rir:"", muscles:["主：小腿（腓肠/比目鱼）"], cues:["脚跟充分下沉","顶端停顿"] },
-            { title:"核心循环 ×2–3", sets:"平板 40–60 s｜Dead Bug 10–12/侧｜侧桥 30–45 s/侧", rir:"", muscles:["核心整体"], cues:["肋骨下压、骨盆稳定"] },
+            { title:"高举深蹲（Goblet）", sets:"4×8–12", muscles:["主：股四头/臀大肌"], cues:["膝随脚尖","底停 1 s","整脚发力"] },
+            { title:"哑铃罗马尼亚硬拉（RDL）", sets:"4×8–10", muscles:["主：腘绳/臀"], cues:["髋主导后移，背中立","沿腿前侧下放"] },
+            { title:"保加利亚分腿蹲", sets:"3×8–12/侧", muscles:["主：股四头/臀大肌"], cues:["前脚全脚掌","臀向下不前冲"] },
+            { title:"臀桥/凳上髋推", sets:"3×10–12", muscles:["主：臀大肌"], cues:["下巴微收","顶峰骨盆后倾 1–2 s"] },
+            { title:"站姿提踵", sets:"4×12–15", muscles:["主：小腿"], cues:["脚跟充分下沉","顶端停顿"] },
+            { title:"核心循环 ×2–3", sets:"平板 40–60 s｜Dead Bug 10–12/侧｜侧桥 30–45 s/侧" }
           ],
           stretching:["弓步髋屈肌/股四头","腘绳（抬高前屈）","梨状肌/臀（鸽子式）","小腿墙面拉伸","猫牛式"],
-          nutrition:[
-            "腿天高碳：乳清 1 勺 + 快碳 40–60 g",
-            "1–2 小时：鸡胸 180–220 g + 主食 100–140 g + 脂肪 10–15 g",
-            "补水 700–900 ml + 电解质"
-          ]
-        },
-        {
-          id:"D4", name:"Push B（胸肩三头变式）",
-          warmup:["轻有氧 → 肩/胸动态 → 卧推动作热身"],
+          nutrition:["腿天高碳：乳清 1 勺 + 快碳 40–60 g","鸡胸 180–220 g + 主食 100–140 g + 脂肪 10–15 g","补水 700–900 ml + 电解质"] },
+
+        { id:"D4", name:"Push B（胸肩三头变式）", warmup:["轻有氧 → 肩/胸动态 → 卧推动作热身"],
           exercises:[
-            { title:"上斜卧推", sets:"4×6–10", rir:"", muscles:["主：胸上束","辅：前三角/三头"], cues:["同 D1 要领"] },
-            { title:"平板卧推", sets:"3×8–12", rir:"", muscles:["主：胸中束"], cues:["同 D1 要领"] },
-            { title:"窄握/钻石俯卧撑", sets:"3×10–15", rir:"", muscles:["主：肱三头/胸内侧"], cues:["肘贴身，底停 1 s"] },
-            { title:"阿诺德推举", sets:"3×8–12", rir:"", muscles:["主：三角肌前/中束","辅：三头"], cues:["下方掌心向内，上推旋外到掌心向前"] },
-            { title:"侧平举（降重）", sets:"2×15–20", rir:"", muscles:["主：三角肌中束"], cues:["顶端停 1 s，最后一组可降重至接近力竭"] },
-            { title:"后臂伸 / 窄握俯卧撑", sets:"2–3×12–15", rir:"", muscles:["主：肱三头外/内侧头"], cues:["上臂定点，只伸肘"] },
+            { title:"上斜卧推", sets:"4×6–10" },
+            { title:"平板卧推", sets:"3×8–12" },
+            { title:"窄握/钻石俯卧撑", sets:"3×10–15" },
+            { title:"阿诺德推举", sets:"3×8–12" },
+            { title:"侧平举（降重）", sets:"2×15–20" },
+            { title:"后臂伸 / 窄握俯卧撑", sets:"2–3×12–15" }
           ],
           stretching:["门框胸肌（多角度）","前三角/胸小肌放松","三头过顶","颈斜方","上胸斜角"],
-          nutrition:[
-            "乳清 1 勺 + 快碳 30–50 g",
-            "正餐：鸡胸 150–200 g + 主食 80–120 g + 脂肪 10–15 g"
-          ]
-        },
-        {
-          id:"D5", name:"Pull B（背变式 + 二头）",
-          warmup:["上背/肩胛激活 → 划船热身"],
+          nutrition:["乳清 1 勺 + 快碳 30–50 g","鸡胸 150–200 g + 主食 80–120 g + 脂肪 10–15 g"] },
+
+        { id:"D5", name:"Pull B（背变式 + 二头）", warmup:["上背/肩胛激活 → 划船热身"],
           exercises:[
-            { title:"单臂划船（拉向髋部）", sets:"4×8–12/侧", rir:"", muscles:["主：背阔（更集中）"], cues:["向髋拉减少上背代偿","离心控制"] },
-            { title:"哑铃耸肩（顶峰停 2 s）", sets:"3×10–12", rir:"", muscles:["主：斜方上部"], cues:["向上向后提，顶峰停 2 s"] },
-            { title:"俯身反向飞鸟（坐姿）", sets:"3×12–15", rir:"", muscles:["主：后束/中下斜方"], cues:["同 D2-4 要领"] },
-            { title:"哑铃上拉", sets:"3×10–12", rir:"", muscles:["主：背阔"], cues:["同 D2-3 要领"] },
-            { title:"交替弯举", sets:"3×10–12/侧", rir:"", muscles:["主：肱二头"], cues:["离心 3 s；非工作侧保持等长张力"] },
-            { title:"反向卷腹", sets:"2×12–15", rir:"", muscles:["主：下腹"], cues:["卷骨盆而非甩腿；下放贴地"] },
+            { title:"单臂划船（拉向髋部）", sets:"4×8–12/侧" },
+            { title:"哑铃耸肩（顶峰停 2 s）", sets:"3×10–12" },
+            { title:"俯身反向飞鸟（坐姿）", sets:"3×12–15" },
+            { title:"哑铃上拉", sets:"3×10–12" },
+            { title:"交替弯举", sets:"3×10–12/侧" },
+            { title:"反向卷腹", sets:"2×12–15" }
           ],
           stretching:["单侧背阔侧屈","穿针引线 + 胸椎旋转","前伸抱球（肩胛分离）","二头胸前伸肘","前臂伸肌"],
-          nutrition:[
-            "乳清 1 勺 + 快碳 30–50 g",
-            "正餐：鸡胸 150–200 g + 主食 80–120 g + 脂肪 10 g"
-          ]
-        },
-        {
-          id:"D6", name:"Legs B & 核心",
-          warmup:["髋/踝/膝动态 → 空杆深蹲/臀桥热身"],
+          nutrition:["乳清 1 勺 + 快碳 30–50 g","鸡胸 150–200 g + 主食 80–120 g + 脂肪 10 g"] },
+
+        { id:"D6", name:"Legs B & 核心", warmup:["髋/踝/膝动态 → 空杆深蹲/臀桥热身"],
           exercises:[
-            { title:"相扑高举深蹲", sets:"4×8–12", rir:"", muscles:["主：内收/臀/股四头"], cues:["站距更宽、脚尖外开 20–30°","膝随脚尖"] },
-            { title:"行走弓步", sets:"3×10–12/侧", rir:"", muscles:["主：股四头/臀中大肌"], cues:["步幅中长，前脚全脚掌发力"] },
-            { title:"台阶上踏", sets:"3×10–12/侧", rir:"", muscles:["主：股四头/臀"], cues:["上踏腿完成主力，慢离心下台"] },
-            { title:"RDL（慢离心 4 s）", sets:"3×8–10", rir:"", muscles:["主：腘绳/臀"], cues:["控制离心 4 秒"] },
-            { title:"单腿提踵", sets:"3×12–15/侧", rir:"", muscles:["主：小腿"], cues:["同 D3-5 要领"] },
-            { title:"核心微循环 ×2–3", sets:"悬空折刀 10–12｜侧向登山 20｜鸟狗 10–12/侧", rir:"", muscles:["核心整体"], cues:["骨盆稳定、四肢对侧伸展"] },
+            { title:"相扑高举深蹲", sets:"4×8–12" },
+            { title:"行走弓步", sets:"3×10–12/侧" },
+            { title:"台阶上踏", sets:"3×10–12/侧" },
+            { title:"RDL（慢离心 4 s）", sets:"3×8–10" },
+            { title:"单腿提踵", sets:"3×12–15/侧" },
+            { title:"核心微循环 ×2–3", sets:"悬空折刀 10–12｜侧向登山 20｜鸟狗 10–12/侧" }
           ],
           stretching:["沙发拉伸/凳上股四头","相扑开跨（内收）","腘绳凳上","臀中肌侧弯","比目鱼（屈膝小腿）"],
-          nutrition:[
-            "腿天高碳：乳清 1 勺 + 快碳 50–70 g",
-            "1–2 小时：鸡胸 200–250 g + 主食 120–160 g + 大份蔬菜",
-            "睡前未达标可加：乳清 0.5–1 勺"
-          ]
-        },
-        {
-          id:"D7", name:"主动恢复",
-          warmup:["30–45′ 低强度有氧（快走/骑行）"],
-          exercises:[{ title:"轻拉伸清单", sets:"各 20–30 s ×1–2", rir:"", muscles:["胸肌","背阔（侧向婴儿式）","髋屈肌","腘绳","小腿","颈斜方"], cues:["保持温和牵拉、呼吸放慢"] }],
+          nutrition:["腿天高碳：乳清 1 勺 + 快碳 50–70 g","鸡胸 200–250 g + 主食 120–160 g + 大份蔬菜","睡前未达标可加：乳清 0.5–1 勺"] },
+
+        { id:"D7", name:"主动恢复", warmup:["30–45′ 低强度有氧（快走/骑行）"],
+          exercises:[{ title:"轻拉伸清单", sets:"各 20–30 s ×1–2", muscles:["胸肌","背阔（侧向婴儿式）","髋屈肌","腘绳","小腿","颈斜方"], cues:["温和牵拉、呼吸放慢"] }],
           stretching:["胸肌","背阔侧向婴儿式","髋屈肌","腘绳肌","小腿","颈斜方"],
-          nutrition:[
-            "总热量较训练日少 150–250 kcal；蛋白不降（115–140 g/日）",
-            "例：鸡胸三餐（总 400–500 g 熟重）+ 适量主食（比训练日少一小碗）+ 乳清按需补齐"
-          ]
-        }
+          nutrition:["比训练日少 150–250 kcal；蛋白不降（115–140 g/日）","鸡胸三餐 + 适量主食，乳清按需补齐"] }
       ]
     };
 
     // —— 状态与渲染 ——
-    const state = {
-      plan: structuredClone(loadPlan() || planData),
-      dayIndex: 0,
-      query: ""
-    };
-
-    function loadPlan(){
-      try{ const raw = localStorage.getItem('workout-plan-json'); return raw? JSON.parse(raw): null }catch(e){ return null }
-    }
+    const state = { plan: structuredClone(loadPlan() || planData), dayIndex: +localStorage.getItem('dayIndex')||0, query: '' };
+    function loadPlan(){ try{ const raw = localStorage.getItem('workout-plan-json'); return raw? JSON.parse(raw): null }catch(e){ return null } }
     function savePlan(){ localStorage.setItem('workout-plan-json', JSON.stringify(state.plan)) }
 
     const dayListEl = document.getElementById('dayList');
@@ -309,13 +243,12 @@
         const btn = document.createElement('button');
         btn.className = 'day-btn' + (i===state.dayIndex? ' active':'');
         btn.innerHTML = `<span><strong>${d.id}</strong> · ${d.name}</span><small>查看</small>`;
-        btn.onclick = ()=>{ state.dayIndex = i; renderAll(); window.scrollTo({top:0,behavior:'smooth'}) };
+        btn.onclick = ()=>{ state.dayIndex = i; localStorage.setItem('dayIndex', i); renderAll(); closeDrawer(); window.scrollTo({top:0,behavior:'smooth'}) };
         dayListEl.appendChild(btn);
       });
     }
 
-    function htmlList(items){ if(!items || !items.length) return '<div class="empty">—</div>'; return `<ul class="cues">${items.map(x=>`<li>${x}</li>`).join('')}</ul>` }
-
+    function htmlList(items){ if(!items || !items.length) return '<div class="links">—</div>'; return `<ul class="cues">${items.map(x=>`<li>${x}</li>`).join('')}</ul>` }
     function keyForCheck(dayIdx, title){ return `done:${dayIdx}:${title}` }
 
     function renderDay(){
@@ -325,8 +258,8 @@
 
       // Exercises
       exGridEl.innerHTML = '';
-      const query = state.query.trim().toLowerCase();
-      const list = (day.exercises||[]).filter(ex=> !query || ex.title.toLowerCase().includes(query) || (ex.muscles||[]).join(',').toLowerCase().includes(query));
+      const q = state.query.trim().toLowerCase();
+      const list = (day.exercises||[]).filter(ex=> !q || ex.title.toLowerCase().includes(q) || (ex.muscles||[]).join(',').toLowerCase().includes(q));
       list.forEach(ex=>{
         const card = document.createElement('div');
         card.className = 'ex-card';
@@ -335,68 +268,59 @@
         card.innerHTML = `
           <div class="ex-top">
             <div class="check ${done? 'done':''}" role="checkbox" aria-checked="${done}" title="点击勾选完成"></div>
-            <div>
-              <div class="title">${ex.title}</div>
-              <div class="meta">${ex.sets?`组次：${ex.sets}`:''}${ex.rir?` · ${ex.rir}`:''}</div>
-            </div>
+            <div><div class="title">${ex.title}</div><div class="meta">${ex.sets?`组次：${ex.sets}`:''}${ex.rir?` · ${ex.rir}`:''}</div></div>
           </div>
           <div class="muscles">${(ex.muscles||[]).map(m=>`<span class="m">${m}</span>`).join('')}</div>
           ${htmlList(ex.cues)}
           <div class="links">${(ex.links||[]).map(l=>`<a target="_blank" rel="noopener" href="${l.href}">🔗 ${l.label}</a>`).join('')}</div>
         `;
         const chk = card.querySelector('.check');
-        chk.addEventListener('click', ()=>{
-          const newDone = !chk.classList.contains('done');
-          chk.classList.toggle('done');
-          localStorage.setItem(key, newDone? '1':'0');
-        });
+        chk.addEventListener('click', ()=>{ const v=!chk.classList.contains('done'); chk.classList.toggle('done'); localStorage.setItem(key, v? '1':'0') });
         exGridEl.appendChild(card);
       });
 
-      // Stretching & Nutrition
       stretchingEl.innerHTML = htmlList(day.stretching);
       nutritionEl.innerHTML = htmlList(day.nutrition);
     }
 
-    function renderAll(){
-      renderDayButtons();
-      renderDay();
-    }
+    function renderAll(){ renderDayButtons(); renderDay(); }
 
-    // —— 交互：导入/导出/打印/主题/搜索 ——
-    document.getElementById('importBtn').addEventListener('click', ()=> document.getElementById('filePicker').click());
-    document.getElementById('filePicker').addEventListener('change', (e)=>{
-      const file = e.target.files?.[0];
-      if(!file) return;
+    // —— 交互：导入/导出/打印/主题/搜索/抽屉 ——
+    const filePicker = document.getElementById('filePicker');
+    document.getElementById('importBtn').addEventListener('click', ()=> filePicker.click());
+    document.getElementById('mImport').addEventListener('click', ()=> filePicker.click());
+    filePicker.addEventListener('change', (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
       const reader = new FileReader();
-      reader.onload = ()=>{
-        try{
-          const json = JSON.parse(reader.result);
-          if(!json.days || !Array.isArray(json.days)) throw new Error('格式不正确：缺少 days 数组');
-          state.plan = json; state.dayIndex = 0; savePlan(); renderAll();
-          alert('导入成功！计划已更新并保存到此设备。');
-        }catch(err){ alert('导入失败：' + err.message) }
-      };
-      reader.readAsText(file, 'utf-8');
-      e.target.value = '';
+      reader.onload = ()=>{ try{ const json = JSON.parse(reader.result); if(!json.days || !Array.isArray(json.days)) throw new Error('格式不正确：缺少 days 数组'); state.plan=json; state.dayIndex=0; savePlan(); renderAll(); alert('导入成功！'); }catch(err){ alert('导入失败：'+err.message) } };
+      reader.readAsText(file, 'utf-8'); e.target.value='';
     });
 
-    document.getElementById('exportBtn').addEventListener('click', ()=>{
-      const blob = new Blob([JSON.stringify(state.plan, null, 2)], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'training-plan.json'; a.click();
-      URL.revokeObjectURL(url);
-    });
+    function exportPlan(){ const blob = new Blob([JSON.stringify(state.plan, null, 2)], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='training-plan.json'; a.click(); URL.revokeObjectURL(url); }
+    document.getElementById('exportBtn').addEventListener('click', exportPlan);
+    document.getElementById('mExport').addEventListener('click', exportPlan);
 
-    document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+    function doPrint(){ window.print() }
+    document.getElementById('printBtn').addEventListener('click', doPrint);
+    document.getElementById('mPrint').addEventListener('click', doPrint);
 
     const THEME_KEY = 'plan-theme-light';
     function applyTheme(){ const isLight = localStorage.getItem(THEME_KEY)==='1'; document.documentElement.classList.toggle('light', isLight) }
     applyTheme();
-    document.getElementById('themeBtn').addEventListener('click', ()=>{ const cur = localStorage.getItem(THEME_KEY)==='1'; localStorage.setItem(THEME_KEY, cur? '0':'1'); applyTheme(); })
+    function toggleTheme(){ const cur = localStorage.getItem(THEME_KEY)==='1'; localStorage.setItem(THEME_KEY, cur? '0':'1'); applyTheme(); }
+    document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+    document.getElementById('mTheme').addEventListener('click', toggleTheme);
 
-    document.getElementById('search').addEventListener('input', (e)=>{ state.query = e.target.value; renderDay(); })
+    // 搜索（去抖）
+    let timer; document.getElementById('search').addEventListener('input', (e)=>{ clearTimeout(timer); const v=e.target.value; timer=setTimeout(()=>{ state.query=v; renderDay(); }, 120) });
+
+    // 抽屉控制
+    const drawer = document.getElementById('drawer');
+    const backdrop = document.getElementById('backdrop');
+    function openDrawer(){ drawer.classList.add('open'); backdrop.classList.add('show') }
+    function closeDrawer(){ drawer.classList.remove('open'); backdrop.classList.remove('show') }
+    document.getElementById('drawerBtn').addEventListener('click', openDrawer);
+    backdrop.addEventListener('click', closeDrawer);
 
     // 初次渲染
     renderAll();
