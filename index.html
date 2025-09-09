@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>增肌训练计划</title>
+<style>
+:root {
+  --bg: #f5f5f5;
+  --text: #333;
+  --primary: #007bff;
+  --accent: #e0e0e0;
+  --card-bg: #fff;
+}
+[data-theme="dark"] {
+  --bg: #222;
+  --text: #eee;
+  --primary: #007bff;
+  --accent: #333;
+  --card-bg: #2a2a2a;
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+.container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+nav {
+  width: 220px;
+  background: var(--accent);
+  overflow-y: auto;
+  border-right: 1px solid var(--primary);
+}
+nav h2 {
+  margin: 0;
+  padding: 16px;
+  font-size: 1.2em;
+  color: var(--primary);
+}
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+nav li {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+nav li.active {
+  background: var(--primary);
+  color: #fff;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+#search {
+  flex: 1 0 300px;
+  padding: 6px 8px;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+}
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.controls button {
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+.controls button:hover {
+  opacity: 0.9;
+}
+main {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+.card {
+  background: var(--card-bg);
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.card h3 {
+  margin-top: 0;
+}
+.exercise-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.exercise-item input {
+  margin-right: 8px;
+  margin-top: 4px;
+}
+.exercise-item .details {
+  flex: 1;
+}
+.exercise-item .details h4 {
+  margin: 0 0 4px 0;
+  font-size: 1em;
+  color: var(--primary);
+}
+.exercise-item .details p {
+  margin: 0 0 4px 0;
+  font-size: 0.88em;
+  line-height: 1.3;
+}
+.exercise-item .details a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.8em;
+}
+.stretch-list, .nutrition {
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+@media (max-width: 768px) {
+  nav {
+    width: 160px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <nav>
+    <h2>训练日</h2>
+    <ul id="dayList"></ul>
+  </nav>
+  <main>
+    <header>
+      <input type="text" id="search" placeholder="搜索动作或肌群..." />
+      <div class="controls">
+        <button id="importBtn">📥 导入计划</button>
+        <input type="file" id="importFile" style="display:none" accept="application/json"/>
+        <button id="exportBtn">📤 导出</button>
+        <button id="printBtn">🖨️ 打印</button>
+        <button id="themeBtn">🌗 切换主题</button>
+      </div>
+    </header>
+    <div id="content"></div>
+  </main>
+</div>
+<script>
+// Default training plan
+const defaultPlan = [
+  {
+    title: "D1｜Push A（胸/肩/三头）",
+    warmUp: "热身：8–10 分钟轻有氧3–5′+肩/胸动态活动+卧推动作热身2组。",
+    strength: [
+      {
+        name: "哑铃平板卧推 4×6–10",
+        muscle: "胸大肌中束",
+        technique: "肩胛后缩下沉，肘外展45–60°，2–3秒离心+底部停1秒",
+        video: ""
+      },
+      {
+        name: "上斜卧推（30°） 3×8–12",
+        muscle: "胸大肌上束",
+        technique: "落点偏上胸，顶端不过伸，避免肩前跑",
+        video: ""
+      },
+      {
+        name: "宽握俯卧撑 3×12–15",
+        muscle: "胸大肌",
+        technique: "身体成一直线，慢离心，胸降至手柄高度",
+        video: ""
+      },
+      {
+        name: "坐姿哑铃肩推 3×6–10",
+        muscle: "三角肌前/中束",
+        technique: "肩下沉不耸，手腕中立，上推至耳旁",
+        video: ""
+      },
+      {
+        name: "侧平举 3×12–15",
+        muscle: "三角肌中束",
+        technique: "肘略高于腕，到肩高即停，顶端停1秒",
+        video: ""
+      },
+      {
+        name: "仰卧臂屈伸 3×10–12",
+        muscle: "肱三头肌长头",
+        technique: "上臂尽量垂直，只伸肘，离心慢",
+        video: ""
+      }
+    ],
+    stretch: [
+      "门框胸肌拉伸（不同角度）",
+      "上胸斜角拉伸",
+      "肱三头过顶拉伸",
+      "前三角/胸小肌放松",
+      "颈斜方轻牵引"
+    ],
+    nutrition: "0–30 分钟：乳清1勺+快碳30–50g；1–2小时：鸡胸150–200g+主食80–120g+健康脂肪10–15g；饮水500–700ml，肌酸5g/天。"
+  },
+  {
+    title: "D2｜Pull A（背/二头/后束）",
+    warmUp: "热身：上背/肩胛激活，划船动作热身。",
+    strength: [
+      {
+        name: "单臂哑铃划船 4×8–12/侧",
+        muscle: "背阔肌、中下斜方",
+        technique: "先收肩胛再弯肘，向髋部拉，离心要有拉伸感",
+        video: "https://www.bilibili.com/video/BV1Va411o7Mc/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"
+      },
+      {
+        name: "胸托哑铃划船 3×10–12",
+        muscle: "中背（菱形/斜方）",
+        technique: "胸骨顶凳、脊柱中立，顶端夹肩胛1秒",
+        video: "https://www.bilibili.com/video/BV1vU411o7ba/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"
+      },
+      {
+        name: "哑铃上拉 3×10–12",
+        muscle: "背阔肌（辅：胸下束）",
+        technique: "肘微屈固定，从胸上→耳后拉伸，回程用背阔带回",
+        video: "https://www.bilibili.com/video/BV1tm4y1s7Np/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"
+      },
+      {
+        name: "俯卧后束飞鸟 3×12–15",
+        muscle: "三角肌后束",
+        technique: "抱大树弧线外展，顶端挤压1秒",
+        video: "https://www.bilibili.com/video/BV1X441157ET/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"
+      },
+      {
+        name: "锤式弯举 3×10–12",
+        muscle: "肱肌、肱桡肌",
+        technique: "中立握、肘贴身，下放2–3秒",
+        video: ""
+      },
+      {
+        name: "旋后弯举 2×12–15",
+        muscle: "肱二头肌",
+        technique: "向上旋后至掌心朝上，顶峰停1秒",
+        video: "https://www.bilibili.com/video/BV18U79zcEwg/?spm_id_from=333.337.search-card.all.click&vd_source=134f9d94571b085ae89e25052eb145e9"
+      }
+    ],
+    stretch: [
+      "背阔肌拉伸（婴儿式）",
+      "穿针引线（胸椎旋转）",
+      "胸椎温和伸展",
+      "二头肌壁拉伸",
+      "前臂屈/伸肌拉伸"
+    ],
+    nutrition: "乳清1勺+快碳30–50g；正餐鸡胸150–200g+主食80–120g+脂肪10g；大量出汗可加电解质。"
+  },
+  {
+    title: "D3｜Legs A & 核心",
+    warmUp: "热身：髋/踝/膝动态 + 空杆深蹲/臀桥热身。",
+    strength: [
+      {
+        name: "高举深蹲 4×8–12",
+        muscle: "股四头肌、臀大肌",
+        technique: "膝随脚尖，底部停1秒，整脚发力",
+        video: ""
+      },
+      {
+        name: "哑铃罗马尼亚硬拉 4×8–10",
+        muscle: "腘绳肌、臀大肌",
+        technique: "髋主导后移，背中立，沿腿前侧下放",
+        video: ""
+      },
+      {
+        name: "保加利亚分腿蹲 3×8–12/侧",
+        muscle: "股四头肌、臀大肌",
+        technique: "前脚全脚掌压地，臀向下不前冲",
+        video: ""
+      },
+      {
+        name: "臀桥/凳上髋推 3×10–12",
+        muscle: "臀大肌",
+        technique: "下巴微收，顶峰骨盆后倾收臀1–2秒",
+        video: ""
+      },
+      {
+        name: "站姿提踵 4×12–15",
+        muscle: "腓肠肌/比目鱼肌",
+        technique: "脚跟充分下沉，顶端停顿",
+        video: ""
+      },
+      {
+        name: "核心循环 2–3轮",
+        muscle: "核心（腹横肌、腹直肌等）",
+        technique: "平板支撑40–60秒+Dead Bug10–12/侧+侧桥30–45秒/侧",
+        video: ""
+      }
+    ],
+    stretch: [
+      "髋屈肌/股四头拉伸（弓步姿）",
+      "腘绳肌拉伸（抬高前屈）",
+      "梨状肌/臀部拉伸（鸽子式）",
+      "小腿腓肠肌拉伸（墙面）",
+      "竖脊肌温和屈伸（猫牛式）"
+    ],
+    nutrition: "乳清1勺+快碳40–60g；正餐鸡胸180–220g+主食100–140g+脂肪10–15g；补水700–900ml+电解质。"
+  },
+  {
+    title: "D4｜Push B（胸肩三头变式）",
+    warmUp: "热身：同D1。",
+    strength: [
+      {
+        name: "上斜卧推 4×6–10",
+        muscle: "胸大肌上束",
+        technique: "同D1要领：落点偏上胸，顶端不过伸",
+        video: ""
+      },
+      {
+        name: "平板卧推 3×8–12",
+        muscle: "胸大肌中束",
+        technique: "同D1要领",
+        video: ""
+      },
+      {
+        name: "窄握/钻石俯卧撑 3×10–15",
+        muscle: "肱三头肌、胸内侧",
+        technique: "肘贴身，底部停1秒",
+        video: ""
+      },
+      {
+        name: "阿诺德推举 3×8–12",
+        muscle: "三角肌前/中束",
+        technique: "下方掌心向内，上推过程中旋外至掌心向前",
+        video: ""
+      },
+      {
+        name: "侧平举（降重） 2×15–20",
+        muscle: "三角肌中束",
+        technique: "顶端停1秒，最后一组降重到接近力竭",
+        video: ""
+      },
+      {
+        name: "后臂伸/窄握俯卧撑 2–3×12–15",
+        muscle: "肱三头肌外/内侧头",
+        technique: "上臂定点，只伸肘",
+        video: ""
+      }
+    ],
+    stretch: [
+      "门框胸肌拉伸（多角度）",
+      "前三角/胸小肌放松",
+      "肱三头过顶拉伸",
+      "颈斜方拉伸",
+      "上胸斜角拉伸"
+    ],
+    nutrition: "乳清1勺+快碳30–50g；正餐鸡胸150–200g+主食80–120g+脂肪10–15g。"
+  },
+  {
+    title: "D5｜Pull B（背变式+二头）",
+    warmUp: "热身：同D2。",
+    strength: [
+      {
+        name: "单臂划船（拉向髋部） 4×8–12/侧",
+        muscle: "背阔肌",
+        technique: "向髋部拉，离心控制",
+        video: ""
+      },
+      {
+        name: "哑铃耸肩 3×10–12",
+        muscle: "斜方肌上部",
+        technique: "向上向后提，顶峰停2秒",
+        video: ""
+      },
+      {
+        name: "俯身反向飞鸟（坐姿） 3×12–15",
+        muscle: "三角肌后束、中下斜方",
+        technique: "抱大树弧线外展，顶端挤压1秒",
+        video: ""
+      },
+      {
+        name: "哑铃上拉 3×10–12",
+        muscle: "背阔肌",
+        technique: "同D2-3要领",
+        video: ""
+      },
+      {
+        name: "交替弯举 3×10–12/侧",
+        muscle: "肱二头肌",
+        technique: "离心3秒，非工作侧保持等长张力",
+        video: ""
+      },
+      {
+        name: "反向卷腹 2×12–15",
+        muscle: "下腹",
+        technique: "卷骨盆而非甩腿，下放贴地",
+        video: ""
+      }
+    ],
+    stretch: [
+      "单侧背阔侧屈拉伸",
+      "穿针引线+胸椎旋转",
+      "前伸抱球（肩胛分离）",
+      "二头肌胸前伸肘拉伸",
+      "前臂伸肌拉伸"
+    ],
+    nutrition: "乳清1勺+快碳30–50g；正餐鸡胸150–200g+主食80–120g+脂肪10g。"
+  },
+  {
+    title: "D6｜Legs B & 核心",
+    warmUp: "热身：同D3。",
+    strength: [
+      {
+        name: "相扑高举深蹲 4×8–12",
+        muscle: "内收肌、臀大肌、股四头肌",
+        technique: "站距更宽，脚尖外开20–30°，膝随脚尖",
+        video: ""
+      },
+      {
+        name: "行走弓步 3×10–12/侧",
+        muscle: "股四头肌、臀中/大肌",
+        technique: "步幅中长，前脚全脚掌受力",
+        video: ""
+      },
+      {
+        name: "台阶上踏 3×10–12/侧",
+        muscle: "股四头肌、臀大肌",
+        technique: "上踏腿完成主力，慢离心下台",
+        video: ""
+      },
+      {
+        name: "RDL（慢离心4秒） 3×8–10",
+        muscle: "腘绳肌、臀大肌",
+        technique: "强调离心控制4秒",
+        video: ""
+      },
+      {
+        name: "单腿提踵 3×12–15/侧",
+        muscle: "小腿",
+        technique: "脚跟充分下沉，顶端停顿",
+        video: ""
+      },
+      {
+        name: "核心微循环 2–3轮",
+        muscle: "核心",
+        technique: "悬空折刀10–12+侧向登山20+鸟狗10–12/侧",
+        video: ""
+      }
+    ],
+    stretch: [
+      "沙发拉伸/凳上股四头",
+      "相扑开跨（内收肌）",
+      "腘绳肌凳上拉伸",
+      "臀中肌侧向拉伸",
+      "比目鱼肌拉伸（屈膝小腿）"
+    ],
+    nutrition: "乳清1勺+快碳50–70g；正餐鸡胸200–250g+主食120–160g+大份蔬菜；未达标可睡前再补乳清。"
+  },
+  {
+    title: "D7｜主动恢复",
+    warmUp: "轻度有氧30–45分钟+全身轻拉伸8–12分钟。",
+    strength: [],
+    stretch: [
+      "胸肌拉伸",
+      "背阔肌（侧向婴儿式）",
+      "髋屈肌拉伸",
+      "腘绳肌拉伸",
+      "小腿拉伸",
+      "颈斜方拉伸"
+    ],
+    nutrition: "总热量比训练日少150–250kcal；蛋白不降（115–140g/日）。例：鸡胸三餐总400–500g + 适量主食 + 乳清按需补齐。"
+  }
+];
+
+// Load plan and progress from localStorage
+let plan = JSON.parse(localStorage.getItem('trainingPlan') || 'null') || defaultPlan;
+let progress = JSON.parse(localStorage.getItem('trainingProgress') || '{}');
+
+const dayListEl = document.getElementById('dayList');
+const contentEl = document.getElementById('content');
+const searchEl = document.getElementById('search');
+
+// Render day list
+function renderDayList(filter = '') {
+  dayListEl.innerHTML = '';
+  plan.forEach((day, index) => {
+    const match = day.title.includes(filter) || day.strength.some(item => item.name.includes(filter) || item.muscle.includes(filter));
+    if (!filter || match) {
+      const li = document.createElement('li');
+      li.textContent = day.title;
+      li.addEventListener('click', () => renderDay(index));
+      dayListEl.appendChild(li);
+    }
+  });
+}
+
+// Render selected day details
+function renderDay(dayIndex) {
+  // Set active on nav list
+  const lis = dayListEl.querySelectorAll('li');
+  lis.forEach((li, idx) => {
+    li.classList.toggle('active', plan.findIndex(d => d.title === li.textContent) === dayIndex);
+  });
+
+  const day = plan[dayIndex];
+  let html = '';
+  html += `<div class="card"><h3>日程：${day.title}</h3>`;
+  if (day.warmUp) {
+    html += `<p><strong>热身：</strong>${day.warmUp}</p>`;
+  }
+  html += '</div>';
+
+  if (day.strength && day.strength.length > 0) {
+    html += `<div class="card"><h3>力量训练</h3>`;
+    day.strength.forEach((ex, idx) => {
+      const exId = dayIndex + '-' + idx;
+      const checked = progress[exId] ? 'checked' : '';
+      html += `<div class="exercise-item">
+        <input type="checkbox" id="chk-${exId}" ${checked} onchange="toggleCheck('${exId}', this.checked)">
+        <div class="details">
+          <h4>${ex.name}</h4>
+          <p><em>部位：</em>${ex.muscle}</p>
+          <p><em>要领：</em>${ex.technique}</p>`;
+      if (ex.video) {
+        html += `<p><a href="${ex.video}" target="_blank">🔗 视频演示</a></p>`;
+      }
+      html += `</div></div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (day.stretch && day.stretch.length > 0) {
+    html += `<div class="card"><h3>拉伸</h3><ul class="stretch-list">`;
+    day.stretch.forEach(s => {
+      html += `<li>${s}</li>`;
+    });
+    html += `</ul></div>`;
+  }
+
+  if (day.nutrition) {
+    html += `<div class="card"><h3>营养补充</h3><p class="nutrition">${day.nutrition}</p></div>`;
+  }
+
+  contentEl.innerHTML = html;
+}
+
+// Toggle checkbox progress
+function toggleCheck(id, state) {
+  if (state) {
+    progress[id] = true;
+  } else {
+    delete progress[id];
+  }
+  localStorage.setItem('trainingProgress', JSON.stringify(progress));
+}
+
+// Search function
+searchEl.addEventListener('input', () => {
+  const keyword = searchEl.value.trim();
+  renderDayList(keyword);
+});
+
+// Import plan
+_document.getElementById('importBtn').addEventListener('click', () => {
+  document.getElementById('importFile').click();
+});
+_document.getElementById('importFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        plan = JSON.parse(evt.target.result);
+        localStorage.setItem('trainingPlan', JSON.stringify(plan));
+        // reset progress
+        progress = {};
+        localStorage.setItem('trainingProgress', JSON.stringify(progress));
+        renderDayList();
+        // select first day
+        const firstLi = dayListEl.querySelector('li');
+        if (firstLi) firstLi.click();
+        alert('已导入新训练计划！');
+      } catch (err) {
+        alert('导入失败：文件格式错误');
+      }
+    };
+    reader.readAsText(file);
+  }
+});
+
+// Export plan
+_document.getElementById('exportBtn').addEventListener('click', () => {
+  const data = JSON.stringify(plan, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'training-plan.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+// Print
+_document.getElementById('printBtn').addEventListener('click', () => {
+  window.print();
+});
+
+// Theme toggle
+_document.getElementById('themeBtn').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  if (current === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+  }
+});
+
+// Initialise theme
+(function() {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }
+})();
+
+// Initial render
+renderDayList();
+if (dayListEl.firstChild) {
+  dayListEl.firstChild.click();
+}
+</script>
+</body>
+</html>
